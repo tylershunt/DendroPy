@@ -486,9 +486,9 @@ class Taxon(base.AnnotatedDataObject):
         memo[id(self)] = o
         return o
 
-    def cmp(taxon1, taxon2):
+    def __lt__(taxon1, taxon2):
         "Compares taxon1 and taxon2 based on label."
-        return cmp(str(taxon1.label), str(taxon2.label))
+        return taxon1.label < taxon2.label
 
     cmp = staticmethod(cmp)
 

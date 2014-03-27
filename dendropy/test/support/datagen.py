@@ -30,6 +30,8 @@ import dendropy
 def four_taxon_tree1():
     taxa = dendropy.TaxonSet(['A', 'B', 'C', 'D'])
     tree = dendropy.Tree(taxon_set=taxa)
+    assert tree.taxon_set is taxa
+    assert tree.taxon_set == tree.taxon_set
     assert tree.taxon_set == taxa
     tree.seed_node.oid = 'root'
     tree.seed_node.label = 'root'

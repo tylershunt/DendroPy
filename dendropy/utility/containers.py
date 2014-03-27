@@ -203,9 +203,8 @@ class OrderedSet(object):
         return id(self)
         return hash( (t for t in self._item_list) )
 
-    def __cmp__(self, o):
-        return cmp((x1 for x1 in self._item_list) , (x2 for x2 in o._item_list))
-
+    def __lt__(self, o):
+        return self._item_list < o._item_list
 
 ###############################################################################
 ## NormalizedBitmaskDict
