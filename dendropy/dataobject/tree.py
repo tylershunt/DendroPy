@@ -157,6 +157,13 @@ class TreeList(list, TaxonSetLinked, iosys.Readable, iosys.Writeable):
         if "label" in kwargs:
             self.label = kwargs["label"]
 
+    def __hash__(self):
+        return id(self)
+        return hash( (t for t in self) )
+
+    def __cmp__(self, o):
+        return cmp((x1 for x1 in self) , (x2 for x2 in self))
+
     def __deepcopy__(self, memo):
         # we treat the taxa as immutable and copy the reference even in a deepcopy
         o = TaxonSetLinked.__deepcopy__(self, memo)

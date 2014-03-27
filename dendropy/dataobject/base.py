@@ -656,7 +656,7 @@ class AnnotationSet(containers.OrderedSet):
         for a in self:
             if a.is_match(**kwargs):
                 results.append(a)
-        results = AnnotationSet(self.target, results)
+        results = AnnotationSet(self.target, frozenset(results))
         return results
 
     def find(self, **kwargs):

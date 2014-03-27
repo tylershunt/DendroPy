@@ -118,45 +118,94 @@ class ItemSublistProxyList(list):
 ###############################################################################
 ## OrderedSet
 
-class OrderedSet(list):
+class OrderedSet(object):
 
     """
     Ordered collection of unique objects.
     """
 
     def __init__(self, *args):
-        list.__init__(self, *args)
+        self._item_list = []
+        self._item_set = set()
+        if len(args) > 1:
+            raise TypeError("Set expected at most 1 arguments, got 2")
+        elif len(args) == 1:
+            for a in args[0]:
+                if a not in self._item_set:
+                    self._item_set.add(a)
+                    self._item_list.append(a)
 
-    def __setitem__(self, *args):
-        raise Exception("'OrderedSet' object does not support item assignment\n")
+    def __len__(self):
+        return len(self._item_list)
 
-    def __str__(self):
-        return "[%s]" % ", ".join([str(i) for i in self])
+    def __getitem__(self, key):
+        return self._item_list[key]
 
-    def __repr__(self):
-        return "%s([%s])" % (self.__class__.__name__, ", ".join([str(i) for i in self]))
+    def __setitem__(self, key, value):
+        item = self._item_list[key]
+        self._item_set.remove(item)
+        self._item_set.add(value)
+        self._item_list[key] = value
 
-    def __hash__(self):
-        return hash( (t for t in self) )
+    def __delitem__(self, key):
+        del self._item_list[key]
+        self._item_set.remove(item)
 
-    def __cmp__(self, o):
-        return list.__cmp__(self, o)
+    def __iter__(self):
+        return iter(self._item_list)
 
-    def add(self, x):
-        if x not in self:
-            list.append(self, x)
-            return x
+    def next(self):
+        return self.__iter__()
+
+    def __reversed__(self):
+        return OrderedSet(reversed(self._item_list))
+
+    def __add__(self, o):
+        v = self._item_list + o._item_list
+        return OrderedSet(v)
+
+    def index(self, value):
+        return self._item_list.index(value)
+
+    def __contains__(self, o):
+        return o in self._item_set
+
+    def add(self, value):
+        if value not in self._item_set:
+            self._item_set.add(value)
+            self._item_list.append(value)
+            return value
         else:
             return None
 
+    def append(self, value):
+        self.add(value)
+
     def update(self, x):
         for i in x:
-            if i not in self:
-                list.append(self, i)
+            if i not in self._item_set:
+                self._item_set.add(i)
+                self._item_list.append(i)
 
     def extend(self, t):
         for x in t:
-            self.append(x)
+            if x not in self._item_set:
+                self._item_set.add(x)
+                self._item_list.append(x)
+
+    def __str__(self):
+        return "[%s]" % ", ".join([str(i) for i in self._item_list])
+
+    def __repr__(self):
+        return "%s([%s])" % (self.__class__.__name__, ", ".join([str(i) for i in self._item_list]))
+
+    def __hash__(self):
+        return id(self)
+        return hash( (t for t in self._item_list) )
+
+    def __cmp__(self, o):
+        return cmp((x1 for x1 in self._item_list) , (x2 for x2 in o._item_list))
+
 
 ###############################################################################
 ## NormalizedBitmaskDict
@@ -177,7 +226,7 @@ class NormalizedBitmaskDict(dict):
         # assert (key & mask) == key
         # return key
     normalize = staticmethod(normalize)
-#     
+#
 #     real_normalize = normalize
 #     def verbose_normalize(key, mask, lowest_relevant_bit):
 #         bm = bin(mask)[2:]
@@ -191,7 +240,7 @@ class NormalizedBitmaskDict(dict):
 #             sm = bm.rjust(l, '0')
 #         sk = bk.rjust(l, '0')
 #         sr = br.rjust(l, '0')
-#         import sys 
+#         import sys
 #         sys.stderr.write('''Normalizing...
 # key  = %s %d
 # mask = %s %d
